@@ -4,7 +4,7 @@ Prequisites:
 - clone multi-value repo and switch to version bf1aea58303ea70d8d380294f97886d821a940a2
     - git clone git@github.com:SALT-NLP/multi-value.git
     - git checkout bf1aea58303ea70d8d380294f97886d821a940a2 
-- install MultiV_REQUIREMENTS.txt
+- install requirements from REQUIREMENTS_MultiV.txt
 - move this script and the HateXplain dataset (../data/hatexplain_original.json) to the multi-value root directory
 
 - Usage:
