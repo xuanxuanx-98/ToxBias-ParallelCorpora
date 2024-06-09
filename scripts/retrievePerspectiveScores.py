@@ -23,16 +23,16 @@ def get_persp_prediction(text):
     API_KEY = None  # this is a placeholder, replace with your own API key
 
     client = discovery.build(
-            "commentanalyzer",
-            "v1alpha1",
-            developerKey=API_KEY,
-            discoveryServiceUrl="https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1",
-            static_discovery=False,
+        "commentanalyzer",
+        "v1alpha1",
+        developerKey=API_KEY,
+        discoveryServiceUrl="https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1",
+        static_discovery=False,
     )
 
     analyze_request = {
-        'comment': { 'text': text },
-        'requestedAttributes': {'TOXICITY': {}}
+        "comment": {"text": text},
+        "requestedAttributes": {"TOXICITY": {}},
     }
 
     response = client.comments().analyze(body=analyze_request).execute()
@@ -62,10 +62,12 @@ def run_batch_on_og(df_batch, n_batch):
         # print(scores)
         time.sleep(0.8)  # pause for 0.8 second to avoid rate limit
 
-    scores_df = pd.DataFrame(scores, columns=['score'])
-    scores_df.to_csv(f"../scores/persp_score_original_batch{n_batch}.csv", sep=",", index=False)
+    scores_df = pd.DataFrame(scores, columns=["score"])
+    scores_df.to_csv(
+        f"../scores/persp_score_original_batch{n_batch}.csv", sep=",", index=False
+    )
 
-    with open(f"../scores/errors_original_batch{n_batch}.json", 'w') as f:
+    with open(f"../scores/errors_original_batch{n_batch}.json", "w") as f:
         json.dump(error_instances, f)
 
     return True
@@ -93,10 +95,12 @@ def run_batch_on_dialect(df_batch, dialect, n_batch):
         # print(scores)
         time.sleep(0.8)  # pause for 0.8 second to avoid rate limit
 
-    scores_df = pd.DataFrame(scores, columns=['score'])
-    scores_df.to_csv(f"../scores/persp_score_{dialect}_batch{n_batch}.csv", sep=",", index=False)
+    scores_df = pd.DataFrame(scores, columns=["score"])
+    scores_df.to_csv(
+        f"../scores/persp_score_{dialect}_batch{n_batch}.csv", sep=",", index=False
+    )
 
-    with open(f"../scores/errors_{dialect}_batch{n_batch}.json", 'w') as f:
+    with open(f"../scores/errors_{dialect}_batch{n_batch}.json", "w") as f:
         json.dump(error_instances, f)
 
     return True
@@ -155,4 +159,3 @@ if __name__ == "__main__":
     run_batch_on_dialect(singlish_batch3, "singlish", "3")
     singlish_batch4 = singlish_full[15000:].reset_index(drop=True)
     run_batch_on_dialect(singlish_batch4, "singlish", "4")
-

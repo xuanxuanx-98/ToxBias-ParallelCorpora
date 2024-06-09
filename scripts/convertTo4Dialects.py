@@ -8,7 +8,7 @@ Prequisites:
 - move this script and the HateXplain dataset (../data/hatexplain_original.json) to the multi-value root directory
 
 - Usage:
-    - from the multi-value root directory run:
+    from the multi-value root directory run:
     $ python convertTo4Dialects.py
 """
 
@@ -22,7 +22,7 @@ from src.Dialects import ColloquialSingaporeDialect
 from src.Dialects import IndianDialect
 
 
-def transform_to_dialect(dialect,df,dialect_name):
+def transform_to_dialect(dialect, df, dialect_name):
     """Take one dialect transform module and apply it to the HateXplain dataset
     Save the results in a jsonl file"""
     sents = []  # {text: ..., rules: [...]}
@@ -32,20 +32,22 @@ def transform_to_dialect(dialect,df,dialect_name):
 
         sent_dict = {}
         sent_dict["text"] = dialect.convert_sae_to_dialect(sent)
-        sent_dict["rules"] = list(set([i["type"] for i in dialect.executed_rules.values()]))
+        sent_dict["rules"] = list(
+            set([i["type"] for i in dialect.executed_rules.values()])
+        )
 
         sents.append(sent_dict)
 
-    with open(f'{dialect_name}.jsonl', 'w') as outfile:
+    with open(f"{dialect_name}.jsonl", "w") as outfile:
         for entry in sents:
             json.dump(entry, outfile)
-            outfile.write('\n')
+            outfile.write("\n")
 
     return True
 
 
-if __name__ == '__main__':
-    # read in the original HateXplain dataset 
+if __name__ == "__main__":
+    # read in the original HateXplain dataset
     df = pd.read_json(f"./hatexplain_original.json").transpose()
 
     # load and run AAVE transform module, save results
