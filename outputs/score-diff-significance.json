@@ -1,0 +1,42 @@
+{
+    "Original vs. AAVE": {
+        "gntox": {
+            "t_statistic": 9.585699942889994,
+            "p_value": 1.20946528341701e-21
+        },
+        "gtox": {
+            "t_statistic": 32.21037159944754,
+            "p_value": 1.3663633663741608e-218
+        }
+    },
+    "Original vs. NigerianD": {
+        "gntox": {
+            "t_statistic": -4.880621216227116,
+            "p_value": 1.0785895427150844e-06
+        },
+        "gtox": {
+            "t_statistic": 9.246618103567101,
+            "p_value": 2.696504369252737e-20
+        }
+    },
+    "Original vs. IndianD": {
+        "gntox": {
+            "t_statistic": 12.756756427483191,
+            "p_value": 6.692747637347256e-37
+        },
+        "gtox": {
+            "t_statistic": 37.085481731716676,
+            "p_value": 1.9198610161306423e-285
+        }
+    },
+    "Original vs. Singlish": {
+        "gntox": {
+            "t_statistic": -5.871461564860905,
+            "p_value": 4.4973972765103815e-09
+        },
+        "gtox": {
+            "t_statistic": 10.01063016060396,
+            "p_value": 1.6843712377622434e-23
+        }
+    }
+}

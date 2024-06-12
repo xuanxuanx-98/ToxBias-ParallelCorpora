@@ -8,6 +8,10 @@ Question:
 
 Usage:
     $ python evaluateToxicityCap.py
+
+Outputs:
+    - To ./outputs: boxplots of all scores across original and dialects
+    - To ./outputs: boxplots of score changes of each instance for each dialect compared to original
 """
 
 import pandas as pd
@@ -84,7 +88,8 @@ def process_batch(batchn):
 def split_tox_nontox(hatexplain_df, to_drop, scores):
     """Split the scores into toxic and non-toxic based on gold labels
     Input: scores of original or dialect text data (all instances)
-    Return: tuple of two lists (scores of gold toxic instances, scores of gold non-toxic instances)"""
+    Return: tuple of two lists (scores of gold toxic instances, scores of gold non-toxic instances)
+    """
     gold_labels = []
     for i in range(len(hatexplain_df)):
         annotations = [an["label"] for an in hatexplain_df["annotators"].iloc[i]]
@@ -108,7 +113,7 @@ def split_tox_nontox(hatexplain_df, to_drop, scores):
             gtox_scores.append(scores[i])
         else:
             gntox_scores.append(scores[i])
-    
+
     score_splits = (gtox_scores, gntox_scores)
 
     return score_splits
@@ -123,18 +128,34 @@ def print_tox_increase_count(og_splits, dialect_splits, dialect_name):
     gtox_og_scores = og_splits[0]
     gtox_dialect_scores = dialect_splits[0]
     gtox_inc = [(a, b) for a, b in zip(gtox_og_scores, gtox_dialect_scores) if a < b]
-    print("gold toxic total:    ", len(gtox_og_scores), "dialect>og:", len(gtox_inc), "--->", round(len(gtox_inc)/len(gtox_og_scores), 4))
+    print(
+        "gold toxic total:    ",
+        len(gtox_og_scores),
+        "dialect>og:",
+        len(gtox_inc),
+        "--->",
+        round(len(gtox_inc) / len(gtox_og_scores), 4),
+    )
 
     # condition 2: instances that are gold non-toxic
     gntox_og_scores = og_splits[1]
     gntox_dialect_scores = dialect_splits[1]
     gntox_inc = [(a, b) for a, b in zip(gntox_og_scores, gntox_dialect_scores) if a < b]
-    print("gold non-toxic total:", len(gntox_og_scores), " dialect>og:", len(gntox_inc), "--->", round(len(gntox_inc)/len(gntox_og_scores), 4))
+    print(
+        "gold non-toxic total:",
+        len(gntox_og_scores),
+        " dialect>og:",
+        len(gntox_inc),
+        "--->",
+        round(len(gntox_inc) / len(gntox_og_scores), 4),
+    )
 
     return True
 
 
-def save_all_score_plots(og_splits, aave_splits, nigerianD_splits, indianD_splits, singlish_splits):
+def save_all_score_plots(
+    og_splits, aave_splits, nigerianD_splits, indianD_splits, singlish_splits
+):
     """Save boxplots of all scores across original and dialects
     The scores are split into two subplots based on gold labels"""
     gtox_og_scores = og_splits[0]
@@ -151,15 +172,33 @@ def save_all_score_plots(og_splits, aave_splits, nigerianD_splits, indianD_split
 
     plt.figure(figsize=(20, 10))
     plt.subplot(1, 2, 1)
-    plt.boxplot([gntox_og_scores, gntox_aave_scores, gntox_nigeriand_scores, gntox_indiand_scores, gntox_singlish_scores], labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"]);
+    plt.boxplot(
+        [
+            gntox_og_scores,
+            gntox_aave_scores,
+            gntox_nigeriand_scores,
+            gntox_indiand_scores,
+            gntox_singlish_scores,
+        ],
+        labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"],
+    )
     plt.title("Perspective scores of gold non-toxic texts")
 
     plt.subplot(1, 2, 2)
-    plt.boxplot([gtox_og_scores, gtox_aave_scores, gtox_nigeriand_scores, gtox_indiand_scores, gtox_singlish_scores], labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"]);
+    plt.boxplot(
+        [
+            gtox_og_scores,
+            gtox_aave_scores,
+            gtox_nigeriand_scores,
+            gtox_indiand_scores,
+            gtox_singlish_scores,
+        ],
+        labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"],
+    )
     plt.title("Perspective scores of gold toxic texts")
 
-    # save plot for overviewing all scores across original and dialects 
-    plt.savefig("../figures/all-scores.png")
+    # save plot for overviewing all scores across original and dialects
+    plt.savefig("../outputs/all-scores.png")
 
     return True
 
@@ -174,41 +213,72 @@ def save_score_change_plots(og_splits, dialect_splits, dialect_name):
     gntox_dialect_scores = dialect_splits[1]
 
     # create a figure and two subplots with a larger height
-    fig, ax = plt.subplots(ncols=2, figsize=(15, 10))  # adjust the first value to increase the width
+    fig, ax = plt.subplots(
+        ncols=2, figsize=(15, 10)
+    )  # adjust the first value to increase the width
     # calculate quartiles for each set of scores
     q1_gntox_og, q3_gntox_og = np.percentile(gntox_og_scores, [25, 75])
     q1_gntox_dialect, q3_gntox_dialect = np.percentile(gntox_dialect_scores, [25, 75])
+
     q1_gtox_og, q3_gtox_og = np.percentile(gtox_og_scores, [25, 75])
     q1_gtox_dialect, q3_gtox_dialect = np.percentile(gtox_dialect_scores, [25, 75])
 
     # create boxplots and lines for original scores and dialect scores
-    ax[0].boxplot([gntox_og_scores, gntox_dialect_scores], positions=[1, 2], widths=0.6, medianprops={"color":"slategrey"})
+    ax[0].boxplot(
+        [gntox_og_scores, gntox_dialect_scores],
+        positions=[1, 2],
+        widths=0.6,
+        medianprops={"color": "slategrey"},
+    )
     for i in range(len(gntox_og_scores)):
-        if q1_gntox_og <= gntox_og_scores[i] <= q3_gntox_og and q1_gntox_dialect <= gntox_dialect_scores[i] <= q3_gntox_dialect:
+        if (
+            q1_gntox_og <= gntox_og_scores[i] <= q3_gntox_og
+            and q1_gntox_dialect <= gntox_dialect_scores[i] <= q3_gntox_dialect
+        ):
             if gntox_og_scores[i] > gntox_dialect_scores[i]:
                 color = "lightblue"
             else:
                 color = "darkorange"
-            ax[0].plot([1, 2], [gntox_og_scores[i], gntox_dialect_scores[i]], color=color, linestyle="-", linewidth=1)
+            ax[0].plot(
+                [1, 2],
+                [gntox_og_scores[i], gntox_dialect_scores[i]],
+                color=color,
+                linestyle="-",
+                linewidth=1,
+            )
     ax[0].set_xticks([1, 2])
     ax[0].set_xticklabels(["Original", f"{dialect_name} (converted)"])
     ax[0].set_title("Perspective scores of gold non-toxic texts")
 
     # create boxplots and lines for original scores and dialect scores
-    ax[1].boxplot([gtox_og_scores, gtox_dialect_scores], positions=[1, 2], widths=0.6, medianprops={"color":"slategrey"})
+    ax[1].boxplot(
+        [gtox_og_scores, gtox_dialect_scores],
+        positions=[1, 2],
+        widths=0.6,
+        medianprops={"color": "slategrey"},
+    )
     for i in range(len(gtox_og_scores)):
-        if q1_gtox_og <= gtox_og_scores[i] <= q3_gtox_og and q1_gtox_dialect <= gtox_dialect_scores[i] <= q3_gtox_dialect:
+        if (
+            q1_gtox_og <= gtox_og_scores[i] <= q3_gtox_og
+            and q1_gtox_dialect <= gtox_dialect_scores[i] <= q3_gtox_dialect
+        ):
             if gtox_og_scores[i] > gtox_dialect_scores[i]:
                 color = "lightblue"
             else:
                 color = "darkorange"
-            ax[1].plot([1, 2], [gtox_og_scores[i], gtox_dialect_scores[i]], color=color, linestyle="-", linewidth=1)
+            ax[1].plot(
+                [1, 2],
+                [gtox_og_scores[i], gtox_dialect_scores[i]],
+                color=color,
+                linestyle="-",
+                linewidth=1,
+            )
     ax[1].set_xticks([1, 2])
     ax[1].set_xticklabels(["Original", f"{dialect_name} (converted)"])
     ax[1].set_title("Perspective scores of gold toxic texts")
 
     # save the plot to the figures folder
-    plt.savefig(f"../figures/{dialect_name}-changes.png")
+    plt.savefig(f"../outputs/{dialect_name}-changes.png")
     print(f"|-- {dialect_name} done!")
 
     return True
@@ -250,20 +320,20 @@ if __name__ == "__main__":
     print_tox_increase_count(og_splits, singlish_splits, "Singlish")
 
     # save boxplots of all scores across original and 4 dialects
-    print("\nSaving all scores plot (split by gold toxic/non-toxc) ...", end="", flush=True)
-    save_all_score_plots(og_splits, aave_splits, nigerianD_splits, indianD_splits, singlish_splits)
+    print(
+        "\nSaving all scores plot (split by gold toxic/non-toxc) ...",
+        end="",
+        flush=True,
+    )
+    save_all_score_plots(
+        og_splits, aave_splits, nigerianD_splits, indianD_splits, singlish_splits
+    )
     print(" done!")
 
     # save boxplots of score changes of each instance for each dialect
     print("Saving OG scores vs. dialect scores comparison plots ...")
-    save_score_change_plots(og_splits, aave_splits, "AAVE")
-    save_score_change_plots(og_splits, nigerianD_splits, "NigerianD")
-    save_score_change_plots(og_splits, indianD_splits, "IndianD")
-    save_score_change_plots(og_splits, singlish_splits, "Singlish")
-    print("All plots saved successfully!")
-
-
-
-
-
-
+    save_score_change_plots(og_splits, aave_splits, "aave")
+    save_score_change_plots(og_splits, nigerianD_splits, "nigerianD")
+    save_score_change_plots(og_splits, indianD_splits, "indianD")
+    save_score_change_plots(og_splits, singlish_splits, "singlish")
+    print("All plots saved to ./outputs as .png successfully!")
