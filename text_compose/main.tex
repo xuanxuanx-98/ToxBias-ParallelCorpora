@@ -64,7 +64,7 @@
 \maketitle
 
 \begin{abstract}
-Hate Speech detection has been a heated topic in NLP/NLU since the spread of social media. Despite the existence of various automatic toxicity scoring models, their biases against language varieties that align with minority identities have been discussed by researchers \citep{sap-etal-2019-risk}. In this work, we focus on Google’s Perspective API and analyze its toxicity scores on four synthetic corpora with different dialect features compared to an original master corpus. We discovered that Perspective (state: March 2024) still scored all parallel corpora significantly differently than the master corpus, which further confirms the existence of the biases. Moreover, we discovered the capping phenomenon with the toxicity scores of the gold toxic sentences.
+Hate Speech detection has been a heated topic in NLP/NLU since the spread of social media. Despite the existence of various automatic toxicity scoring models, their biases against language varieties that align with minority identities have been discussed by researchers \citep{sap-etal-2019-risk}. In this work, we focus on Google’s Perspective API and analyze its toxicity scores on four synthetic corpora with different dialect features compared to an original master corpus. We discovered that Perspective (state: March 2024) still scored all parallel corpora significantly differently than the master corpus, which further confirms the existence of the biases. Moreover, we discovered the capping phenomenon with the toxicity scores of the gold toxic sentences: Gold non-toxic sentences are more liketly to suffer from toxicity score increase, when converted to a dialect, compared to gold toxic sentences.
 \end{abstract}
 
 
