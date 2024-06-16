@@ -1,0 +1,8 @@
+# ignore all files in text_compose folder
+text_compose/.*
+text_compose/*
+# excetption rules for relevant files
+!text_compose/figs-misc
+!text_compose/*.tex
+!text_compose/*.pdf
+!text_compose/*.bib
