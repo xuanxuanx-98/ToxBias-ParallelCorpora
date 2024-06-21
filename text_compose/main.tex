@@ -32,6 +32,7 @@
 \usepackage{inconsolata}
 
 \usepackage{linguex}
+\usepackage{csquotes}
 
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
@@ -75,12 +76,21 @@ With the increasing popularity of social media and the daily widening user bases
 
 However current detoxifying approaches are proven to be not perfect. While the reactive methods are commonly subject to deficiency and passivity, the automatic proactive methods often discriminate against minority aligned language varieties other than Standard American English (SAE) \citep{sap-etal-2019-risk, zhou-etal-2021-challenges}.
 
-This research aims to test the performance of Google’s Perspective API on five parallel corpora. Despite being a continuously improving model on toxicity scoring \citep{google-perspective}, the bias against non-standard English is still present in the results. The model scored (state: March 2024) texts from the four English dialects: African American Vernacular English (AAVE), Nigerian and Indian dialects and Singaporean English (Singlish) significantly differently than the original texts of standard English. Thus, we posit that there is a continued need for optimization in the hate speech detection of online contents for better mitigating biases that may infringe upon the online representation of individuals from marginalized communities.
+This research aims to test the performance of Google’s Perspective API on five parallel corpora. Despite being a continuously improving model on toxicity scoring \citep{google-perspective}, the bias against non-standard English is still present in the results. The model scored (state: March 2024) texts from the four English dialects: African American Vernacular English (AAVE), Nigerian and Indian dialects and Singaporean English (Singlish). significantly differently than the original texts of standard English. Thus, we posit that there is a continued need for optimization in the hate speech detection of online contents for better mitigating biases that may infringe upon the online representation of individuals from marginalized communities.
 
 
 \section{Background}
 
+The process of detoxification and hate speech detection is aimed to create healthy and welcoming online communities. Yet the biases in these processes are leading to not only unfair penalties for minority individuals \citep{davidson-etal-2019-racial} but also potential complete exclusion of their voices in online spaces \citep{blodgett-2017-racial} simply because of the usage of non-standard language.
 
+The underlying reasons behind such biases can be traced back to multiple factors. As \citet{xia-etal-2020-demoting} points out, first-hand annotators are inclined to classify non-abusive AAE texts as toxic, which may lead to bias already at the corpus creation stage. Secondly, surface markers on the language such as mention of specific identity terms and usage of certain uncommon patterns are also prone to cause the so-called \enquote{key word bias} in models \citep{resende-2024-comprehensive, schafer-2023-bias}. The lack of data of English language varieties in the training data may lead to their incapability to capture the real intentions and deep meanings of such speeches. Last but not the least, suboptimal performances of hate speech detection models can also be attributed to the ignorance of linguistic subtleties engrained in contextual factors such as speaker identity, environment and even special spelling \citep{davidson-etal-2019-racial}.
+
+Several methodologies have been proposed to mitigate these biases. \citet{schafer-2023-bias} experimented with transformer based multi-class prediction in order to establish a more comprehensive viewpoint for hate speech detection with less success. Moreover, the approach of masking out identity terms exhibits obvious drawbacks despites its merits. By raising subjectivity level when identity terms occur, \citep{zhao-2022-subjectivity} were able to efficiently neutralize their model’s bias against minority aligned texts. Similar effects can be achieved by including confident dialect prediction \citep{ball-2021-differential}. By implementing adversarial learning during the model learning process, \citet{xia-etal-2020-demoting} and \citep{okpala-2022-aaebert} were both able to reduce baseline model’s false positive rate facing African American English like texts.
+
+
+\section{Data}
+
+\subsection{HateXplain}
 
 
 
@@ -130,61 +140,21 @@ This research aims to test the performance of Google’s Perspective API on five
 
 \newpage
 
-\section{Introduction}
+\subsection{Synthetic datasets}
 
-The term ``named entity'' was first defined in the Sixth Message Understanding Conference (MUC-6) \citep{grishman1996ner}. In the publicly available description, at least three types of language expressions were categorized as such entities: ``unique identifiers'' of entities (organizations, persons, locations), times (dates, times), and quantities (monetary values, percentages). The extraction of such entities from a sentence is, however, not a trivial job. Outside the most obvious dictionary matching \citep{higashinaka2012nerwiki,shang2018learning}, several other hybrid approaches have been proposed over the years, especially for bio-medical and other domain-specific terms \citep{rock2012nerbio,lou2020dicthyb}. Nowadays, with pre-trained language models spaCy, StanfordNLP as such, named entity recognition tasks can be easily carried out as part of the standard pipeline during text annotation.
-
-This research aims to investigate the multi-purposed language model spaCy's performance on named entity recognition tasks when it comes to multilingual data, above all where two languages are used interchangeably in one sentence, the so-called insertional code-switching, as follows:
-
-\ex. @esangiecarajo you asked .. \textit{ya lo borre} so chill \textit{jajajajaja}
-
-The sentence starts with a matrix sentence (L1) in English. An embedded clause in Spanish is then inserted (L2, italicized). The language is switched back to English. Followed by modal particles again in Spanish. We want to know how difficult it is for a monolingual spaCy model to deal with such inserted tokens as in this sentence.
-
-
-\section{Research Questions}
-
-The research questions can be summarized into three major points:
-
-Firstly, how many inserted L2 tokens that are not named entities themselves are falsely annotated as named entities by spaCy? Named entities in nature are unique to the language's vocabulary. Since the inserted L2 tokens are ``foreign'' to a language-specific model, we would expect that some of the unique words would be annotated as NEs.
-
-Secondly, among the tokens that are falsely tagged as named entities, how many are just inserted non-NE L2 tokens? Namely, how many errors are caused by code-switching? By analyzing this aspect, we are able to estimate how troublesome code-switching actually is for a spaCy model. Furthermore, we would also be able to determine whether it is reasonable to use spaCy on the named entity recognition tasks of code-mixed data.
-
-
-Finally, we also calculate how many inserted L2 tokens that are actually named entities are correctly identified as NEs by the L1 model. This also helps us to understand how effective spaCy is, if we are only interested in extracting NEs tokens from the embedded language.
-
-
-\section{Data}
-
-The data comes from Computational Approaches to Linguistic Code-Switching (CALCS) \citep{aguilaretal2018calcs}, which are accessible through the LinCE Benchmark website (\href{https://ritual.uh.edu/lince/datasets}{https://ritual.uh.edu/lince/datasets}). The specific subset used in this research is the train set in Spanish-English (SPA-ENG) from CALCS Shared Task 2018.
-
-The original data is stored in minimal CoNLL-U format. Sentences are separated by empty lines. The tokens in the sentence are all on individual lines. The tokens are marked with language tags (\texttt{lang1} for English, \texttt{lang2} for Spanish). Whether the tokens are named entities and to what type of named entities they belong to, is also marked overtly.
-
-Overall, there are 33,611 sentences, among which 8,692 contain both English and Spanish tokens (code-mixed). By comparing the absolute language tag amount in each sentence, we get 1,478 instances with English as the matrix language, and 7,214 are Spanish dominant.
-
+\subsection{Data choice}
 
 \section{Methodology}
 
-Since spaCy models are usually built on monolingual data, the choice of which language-specific model should be used to annotate the current sentence needs to be made based on individual cases. The general pipeline goes as follows: 1) Before applying the NLP model, make sure both languages are present in the current sentence; 2) Determine the matrix language (L1) of the sentence; 3) Choose the spaCy model for L1 to annotate the whole sentence, regardless of the inserted L2 tokens; 4) Retrieve named entity recognition results from linguistic features (\href{https://spacy.io/usage/linguistic-features}{https://spacy.io/usage/linguistic-features}) built in spaCy's standard pipeline. For effeciency reasons, here we only use small variante of models for both languages: \texttt{en\_core\_web\_sm} and \texttt{es\_core\_news\_sm}.
-
-Since spaCy only works on strings, the raw token chain of each sentence will be concatenated in the first step. The new text string will be passed to the language model. This, however, causes alignment issues when spaCy's tokenization results differ from the gold tokens in the original sentence dataframe. The solution is to store the named entities extracted by spaCy simply as list items. Then we go through the original token column. If the token is found in the spaCy's NE list, we mark it as \texttt{Yes}, if not, as \texttt{O}, following the original label scheme.
-
-The focus of this experiment lies in whether the model could sufficiently distinguish between inserted code-switched normal words and named entities. The types of NEs the results tokens are assigned to are less relevant. Hence, we replace all specific named entity types in both gold tags and spaCy results with a unified value \texttt{Yes}. 
-
-For the results of each sentence, four types of information are saved: the matrix language, the gold language tags of all tokens in the sentence, the gold named entity property, and the NER results returned by spaCy model. The latter three are stored in a list aligned to the gold token list of the original sentence, on which the error analyses can be conducted.
-
-
-\section{Error Analyses}
-
-For the first research question, we extracted all indices of all code-switched tokens in each sentence. That is, if the matrix language of the sentence is identified as English, we extract all Spanish tokens, and vice versa. We also want to exclude cases where the inserted tokens are named entities themselves. With the list of target words' indices, the corresponding NER results from the automatic annotation will be compared. The target tokens falsely tagged as \texttt{Yes} by spaCy will be filtered out. As for results, we have 38.38\% of normal L2 tokens tagged as named entities.
-
-To investigate the relation between the performance drop and the insertions of L2 tokens, we first collect all named entity tags that are falsely given by spaCy. Then we map these errors to the language tags. If the token on which the error occurs is code-switched, it will be saved to the error list. Dividing NER errors on code-switching points by total NER errors, we get results of 27.19\%. That is, over a quarter of named entity recognition errors are simply due to L2 token insertions.
-
-Lastly, we turn to the few cases where the inserted L2 tokens are actually named entities themselves. We collect all the L2 tokens in a sentence. Then we save those that are tagged as \texttt{Yes} in the normalized gold labels. Our goal is to find out the cases where spaCy also gives \texttt{Yes} tags to these target words (L2 NEs). From the results, we see that almost 70\% of these true L2 named entities are correctly tagged as NEs. The error rate is relatively low compared to earlier analyses. However, it is unclear whether this is because spaCy could overcome the ``language barrier'' while dealing with L2 named entities or simply by chance. Given the fact that by assigning NE tags to all indiscriminately would even achieve 100\% accuracy, the actual performances of the models are still questionable.
-
+\section{Results}
 
 \section{Conclusion}
 
-In this experiment, we looked into monolingual spaCy language models' performances on named entity recognition tasks with code-mixed data. We see that about 40\% of inserted L2 tokens are falsely recognized as named entities, which indicates that code-switching does pose a challenge to monolingual language models in NER. However, under 30\% of the errors are directly caused by code-switching. To what degree CS affects performance is therefore unclear.
+
+
+
+\newpage
+
 
 
 
@@ -196,9 +166,9 @@ In this experiment, we looked into monolingual spaCy language models' performanc
 
 \appendix
 
-\section{Data Access}
+\section{Code Access}
 
-Project work and detailed instructions on how to retrieve the data needed for the analyses are accessible under: \href{https://osf.io/zsm43/}{DOI 10.17605/OSF.IO/ZSM43}.
+Source code and detailed instructions for conducting analyses are publicly accessible under: \href{https://github.com/xuanxuanx-98/ToxBias-ParallelCorpora}{https://github.com/xuanxuanx-98/ToxBias-ParallelCorpora}.
 
 
 \end{document}
