@@ -90,10 +90,21 @@ Several methodologies have been proposed to mitigate these biases. \citet{schafe
 
 \section{Data}
 
+This section provides an overview on the dataset used in this research. The data augmentation and synthesizing technique will be explained. The choice of the synthetic approach will also be substantiated.
+
 \subsection{HateXplain}
 
+The data the research is based on stems from the publicly available HateXplain\footnote{\url{https://github.com/hate-alert/HateXplain}} dataset. HateXplain is designed for interpretation of hate speech detection results based on certain text features. It includes 20,047 instances from Twitter and Gab posts collected around the year 2020. Besides the class labeling (\textit{hate}, \textit{offensive} or \textit{normal}), targeted groups and rationales (text chunk that directly contributes to the decision) are also included in the annotation scheme. Each post is annotated by three Amazon Mechanical Turk (MTurk) workers. 919 instances, where all three annotators decide for a different class, are excluded from the final compilation, which ensures the credibility of the annotation results \citep{mathew-2021-hatexplain}.
 
+Since the original class label is tri-partie and the dichotomy of toxicity is interested in the research, we combine \textit{hate} and \textit{offensive} together as toxic, and reinterpret \textit{normal} as non-toxic. Based on majority voting among the three annotators, we are able to retrieve 12,276 toxic and 7,771 non-toxic posts.
 
+The HateXplain dataset with the newly interpreted labels will be referred to as the \textbf{original} or \textbf{master dataset} in the following texts.
+
+\subsection{Synthetic datasets}
+
+Acknowledging the restricted capabilities of current NLP systems on different English language varieties, the Multi-VALUE\footnote{\url{https://github.com/SALT-NLP/multi-value/tree/main}} package \citep{ziems-2023-multi} provides a complete framework for rule-based English dialect transformation and evaluation. By applying syntactic and morphological transformation rules based on 189 unique features, Multi-VALUE is able to convert SAE to 50 English dialects.
+
+In this experiment, we choose four representative dialects: African American Vernacular English (\textbf{AAVE}), Nigerian English (\textbf{NigerianD}), Indian English (\textbf{IndianD}) and Colloquial Singapore English (\textbf{Singlish}). The selection includes English dominant communities spanning across three major continents with different historic relations with the English language, which provides good representativeness on the general tendency comparing standard English and dialects.
 
 
 
@@ -140,7 +151,6 @@ Several methodologies have been proposed to mitigate these biases. \citet{schafe
 
 \newpage
 
-\subsection{Synthetic datasets}
 
 \subsection{Data choice}
 
