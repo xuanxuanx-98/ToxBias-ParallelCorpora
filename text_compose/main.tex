@@ -33,6 +33,8 @@
 
 \usepackage{linguex}
 \usepackage{csquotes}
+\usepackage{caption}
+\usepackage{graphicx}
 
 % If the title and author information does not fit in the area allocated, uncomment the following
 %
@@ -83,7 +85,7 @@ This research aims to test the performance of Google’s Perspective API on five
 
 The process of detoxification and hate speech detection is aimed to create healthy and welcoming online communities. Yet the biases in these processes are leading to not only unfair penalties for minority individuals \citep{davidson-etal-2019-racial} but also potential complete exclusion of their voices in online spaces \citep{blodgett-2017-racial} simply because of the usage of non-standard language.
 
-The underlying reasons behind such biases can be traced back to multiple factors. As \citet{xia-etal-2020-demoting} points out, first-hand annotators are inclined to classify non-abusive AAE texts as toxic, which may lead to bias already at the corpus creation stage. Secondly, surface markers on the language such as mention of specific identity terms and usage of certain uncommon patterns are also prone to cause the so-called \enquote{key word bias} in models \citep{resende-2024-comprehensive, schafer-2023-bias}. The lack of data of English language varieties in the training data may lead to their incapability to capture the real intentions and deep meanings of such speeches. Last but not the least, suboptimal performances of hate speech detection models can also be attributed to the ignorance of linguistic subtleties engrained in contextual factors such as speaker identity, environment and even special spelling \citep{davidson-etal-2019-racial}.
+The underlying reasons behind such biases can be traced back to multiple factors. As \citet{xia-etal-2020-demoting} and \citet{sap-etal-2022-annotators} point out, first-hand annotators are inclined to classify non-abusive AAE texts as toxic, which may lead to bias already at the corpus creation stage. Secondly, surface markers on the language such as mention of specific identity terms and usage of certain uncommon patterns are also prone to cause the so-called \enquote{key word bias} in models \citep{resende-2024-comprehensive, schafer-2023-bias}. The lack of data of English language varieties in the training data may lead to their incapability to capture the real intentions and deep meanings of such speeches. Last but not the least, suboptimal performances of hate speech detection models can also be attributed to the ignorance of linguistic subtleties engrained in contextual factors such as speaker identity, environment and even special spelling \citep{davidson-etal-2019-racial}.
 
 Several methodologies have been proposed to mitigate these biases. \citet{schafer-2023-bias} experimented with transformer based multi-class prediction in order to establish a more comprehensive viewpoint for hate speech detection with less success. Moreover, the approach of masking out identity terms exhibits obvious drawbacks despites its merits. By raising subjectivity level when identity terms occur, \citep{zhao-2022-subjectivity} were able to efficiently neutralize their model’s bias against minority aligned texts. Similar effects can be achieved by including confident dialect prediction \citep{ball-2021-differential}. By implementing adversarial learning during the model learning process, \citet{xia-etal-2020-demoting} and \citep{okpala-2022-aaebert} were both able to reduce baseline model’s false positive rate facing African American English like texts.
 
@@ -94,7 +96,7 @@ This section provides an overview on the dataset used in this research. The data
 
 \subsection{HateXplain}
 
-The data the research is based on stems from the publicly available HateXplain\footnote{\url{https://github.com/hate-alert/HateXplain}} dataset. HateXplain is designed for interpretation of hate speech detection results based on certain text features. It includes 20,047 instances from Twitter and Gab posts collected around the year 2020. Besides the class labeling (\textit{hate}, \textit{offensive} or \textit{normal}), targeted groups and rationales (text chunk that directly contributes to the decision) are also included in the annotation scheme. Each post is annotated by three Amazon Mechanical Turk (MTurk) workers. 919 instances, where all three annotators decide for a different class, are excluded from the final compilation, which ensures the credibility of the annotation results \citep{mathew-2021-hatexplain}.
+The data the research is based on stems from the publicly available HateXplain\footnote{\url{https://github.com/hate-alert/HateXplain}} dataset. HateXplain is designed for interpretation of hate speech detection results based on certain text features. It includes 20,148 instances from Twitter and Gab posts collected around the year 2020. Besides the class labeling (\textit{hate}, \textit{offensive} or \textit{normal}), targeted groups and rationales (text chunk that directly contributes to the decision) are also included in the annotation scheme. Each post is annotated by three Amazon Mechanical Turk (MTurk) workers. 919 instances, where all three annotators decide for a different class, are excluded from the final compilation, which ensures the credibility of the annotation results \citep{mathew-2021-hatexplain}.
 
 Since the original class label is tri-partie and the dichotomy of toxicity is interested in the research, we combine \textit{hate} and \textit{offensive} together as toxic, and reinterpret \textit{normal} as non-toxic. Based on majority voting among the three annotators, we are able to retrieve 12,276 toxic and 7,771 non-toxic posts.
 
@@ -106,65 +108,81 @@ Acknowledging the restricted capabilities of current NLP systems on different En
 
 In this experiment, we choose four representative dialects: African American Vernacular English (\textbf{AAVE}), Nigerian English (\textbf{NigerianD}), Indian English (\textbf{IndianD}) and Colloquial Singapore English (\textbf{Singlish}). The selection includes English dominant communities spanning across three major continents with different historic relations with the English language, which provides good representativeness on the general tendency comparing standard English and dialects.
 
+To measure the distinction of the dialect coded texts, the rules applied on each instance are saved as references. Among the 100 most used rules for each dialect conversion, only 13 of them overlap. This indicates the transformation features are relatively specific to each dialect and inter corpora differences among the synthetic data is high. Examples for most used rules for transformation to each dialect can be found in Appendix \ref{rules}.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
-
+In the end, all 20,148 texts from the master dataset were successfully converted to dialect.
 
 \subsection{Data choice}
 
+Most of the research focused on bias in toxicity detection so far are based on two separate sets of text data \citep{sap-etal-2019-risk, davidson-etal-2019-racial, ball-2021-differential, zhou-etal-2021-challenges}. The data could be sourced from the same domain (i.e. the same social media platform) and split into two subsets. One for standard English and one for texts with certain dialect features. Such an approach ensures the authenticity of the data, since they are real interactions of users online. However, there is no real correlation between the texts in those two subsets. At the same time, manual splitting the data requires extra labor. The subjectivity of the annotators may also lead to inaccuracy of categorization of different dialects. Moreover, scarcity has always been an issue while dealing with minority aligned language usage \citep{dash-2019-scarcity}. Even on social media, where dialect styled writings are more frequent, the data with such features are still scarce and costly to collect \citep{jorgensen-2015-challenges}. These issues are the underlying reasons for the inability to scale in the research focused on dialects and low resource languages.
+
+The advantage of Multi-VALUE in this respect is that we can augment a large number of text data with features specific to certain dialects under the investigation of a study. Using data augmentation to combat scarcity issues is a common approach \citep{bird-2020-augmentation}. While partly sacrificing the authenticity of the data, Multi-VALUE shows strong capability of preserving meaning and ensuring syntactic integrity and naturalness \citep{ziems-2022-value, ziems-2023-multi}.
+
+Because the augmented data is 1:1 parallel to that in the master dataset, we are able to investigate the behaviors of one instance with or without dialect features individually. Other than that, by applying multiple conversions, larger scale studies on multiple dialects are also possible, without massive investment in time and energy. Finally, while examining the toxicity score changes after conversion, by backtracking the transformation rules that were used for the conversion, it is also possible to identify the dialect specific features that are responsible for the increase or decrease in text toxicity. This would not be possible if only collected data are used, unless every feature in the dialect data is readily available.
+
 \section{Methodology}
+
+Perspective API is a multilingual machine learning model for identifying abusive comments developed by Google \citep{jigsaw-2017-perspective}. It has been in constant development since its introduction. The data are sourced from online forums and all manually annotated. The quality of the annotations is ensured by 3-10 annotators per sentence. Being trained on such in-house compiled datasets, Perspective API provides a useful metric to detect hate speech texts from HateXplain dataset without causing data contamination.
+
+All sentences in the five parallel corpora with differently styled English were passed directly to Google’s Perspective API for toxicity scoring using Google Colaboratory platform (access date: March 2024). Because of the 1 request per second rate limit of Perspective, we defined a 0.8 second wait time after successfully retrieving the score of the current sentence. The data are split into 4 batches with 5000 each to address the access time restriction of Google Colab.
 
 \section{Results}
 
-\section{Conclusion}
+
+
+\subsection{Reliability of Perspective API's scores}
+
+
+\begin{figure*}[t]
+  \includegraphics[width=1.0\linewidth]{figs-misc/all-scores.png}
+  \caption{Toxicity scores of HateXplain texts by Perspective API across five parallel corpora. 1 = absolute toxic; 0 = not toxic. The scores are split into two subsets based on the gold labels included in the HateXplain annotations.}
+\end{figure*}
+
+
+\begin{figure*}[t]
+  \includegraphics[width=0.48\linewidth]{figs-misc/aave-changes.png}\hfill
+  \includegraphics[width=0.48\linewidth]{figs-misc/aave-changes.png}\\
+  \includegraphics[width=0.48\linewidth]{figs-misc/aave-changes.png}\hfill
+  \includegraphics[width=0.48\linewidth]{figs-misc/aave-changes.png}
+  \caption{}
+\end{figure*}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 \newpage
 
+
+
+
+
+\section{Conclusion}
+
+\section{Future Studies}
 
 
 
@@ -173,12 +191,85 @@ In this experiment, we choose four representative dialects: African American Ver
 \bibliographystyle{./figs-misc/acl_natbib}
 
 
-
 \appendix
 
-\section{Code Access}
+\section{Code access}
 
 Source code and detailed instructions for conducting analyses are publicly accessible under: \href{https://github.com/xuanxuanx-98/ToxBias-ParallelCorpora}{https://github.com/xuanxuanx-98/ToxBias-ParallelCorpora}.
+
+\section{Rule frequency for dialect conversion} \label{rules}
+
+\begin{center}
+\begin{tabular}{lr}
+\hline
+\textbf{rule name}                     & \textbf{frequency} \\ \hline
+yall                                   & 4379               \\
+demonstrative\_for\_definite\_articles & 4197               \\
+mass\_noun\_plurals                    & 4112               \\
+regularized\_plurals                   & 4083               \\
+uninflect                              & 3595               \\
+zero\_plural                           & 2540               \\
+null\_relcl                            & 2401               \\
+double\_modals                         & 2303               \\
+drop\_copula\_be\_NP                   & 2294               \\
+progressives                           & 2277               \\ \hline
+\end{tabular}
+\captionof{table}{Top 10 rules used for converting to African American Vernacular English.}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lr}
+\hline
+\textbf{rule name}         & \textbf{frequency} \\ \hline
+null\_prepositions         & 8651               \\
+mass\_noun\_plurals        & 8476               \\
+remove\_det\_definite      & 7326               \\
+progressives               & 6964               \\
+drop\_inf\_to              & 5704               \\
+yall                       & 2785               \\
+regularized\_plurals       & 2660               \\
+regularized\_past\_tense   & 1636               \\
+drop\_aux\_be\_progressive & 1524               \\
+come\_future               & 1401               \\ \hline
+\end{tabular}
+\captionof{table}{Top 10 rules used for converting to Nigerian English.}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lr}
+\hline
+\textbf{rule name}                  & \textbf{frequency} \\ \hline
+progressives                        & 10650              \\
+mass\_noun\_plurals                 & 6902               \\
+remove\_det\_definite               & 5567               \\
+present\_perfect\_for\_past         & 4820               \\
+acomp\_focusing\_like               & 4364               \\
+definite\_for\_indefinite\_articles & 4211               \\
+regularized\_plurals                & 4043               \\
+null\_prepositions                  & 3699               \\
+null\_referential\_pronouns         & 3675               \\
+object\_pronoun\_drop               & 3490               \\ \hline
+\end{tabular}
+\captionof{table}{Top 10 rules used for converting to Indian English.}
+\end{center}
+
+\begin{center}
+\begin{tabular}{lr}
+\hline
+\textbf{rule name}          & \textbf{frequency} \\ \hline
+null\_prepositions          & 13860              \\
+one\_relativizer            & 11109              \\
+zero\_plural                & 8798               \\
+plural\_to\_singular\_human & 6849               \\
+remove\_det\_definite       & 6549               \\
+mass\_noun\_plurals         & 4322               \\
+remove\_det\_indefinite     & 4078               \\
+null\_referential\_pronouns & 3588               \\
+object\_pronoun\_drop       & 3278               \\
+drop\_inf\_to               & 3273               \\ \hline
+\end{tabular}
+\captionof{table}{Top 10 rules used for converting to Colloquial Singapore English.}
+\end{center}
 
 
 \end{document}

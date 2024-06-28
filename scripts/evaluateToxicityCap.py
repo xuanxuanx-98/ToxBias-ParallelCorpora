@@ -198,7 +198,7 @@ def save_all_score_plots(
     plt.title("Perspective scores of gold toxic texts")
 
     # save plot for overviewing all scores across original and dialects
-    plt.savefig("../outputs/all-scores.png")
+    plt.savefig("../outputs/all-scores.png", bbox_inches='tight')
 
     return True
 
@@ -278,7 +278,7 @@ def save_score_change_plots(og_splits, dialect_splits, dialect_name):
     ax[1].set_title("Perspective scores of gold toxic texts")
 
     # save the plot to the figures folder
-    plt.savefig(f"../outputs/{dialect_name}-changes.png")
+    plt.savefig(f"../outputs/{dialect_name}-changes.png", bbox_inches='tight')
     print(f"|-- {dialect_name} done!")
 
     return True
