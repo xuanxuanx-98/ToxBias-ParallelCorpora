@@ -158,6 +158,12 @@ def save_all_score_plots(
 ):
     """Save boxplots of all scores across original and dialects
     The scores are split into two subplots based on gold labels"""
+    og_scores = og_splits[0] + og_splits[1]
+    aave_scores = aave_splits[0] + aave_splits[1]
+    nigerianD_scores = nigerianD_splits[0] + nigerianD_splits[1]
+    indianD_scores = indianD_splits[0] + indianD_splits[1]
+    singlish_scores = singlish_splits[0] + singlish_splits[1]
+
     gtox_og_scores = og_splits[0]
     gtox_aave_scores = aave_splits[0]
     gtox_nigeriand_scores = nigerianD_splits[0]
@@ -171,7 +177,20 @@ def save_all_score_plots(
     gntox_singlish_scores = singlish_splits[1]
 
     plt.figure(figsize=(20, 10))
-    plt.subplot(1, 2, 1)
+    plt.subplot(1, 3, 1)
+    plt.boxplot(
+        [
+            og_scores,
+            aave_scores,
+            nigerianD_scores,
+            indianD_scores,
+            singlish_scores
+        ],
+        labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"],
+    )
+    plt.title("Overall Perspective scores")
+
+    plt.subplot(1, 3, 2)
     plt.boxplot(
         [
             gntox_og_scores,
@@ -184,7 +203,7 @@ def save_all_score_plots(
     )
     plt.title("Perspective scores of gold non-toxic texts")
 
-    plt.subplot(1, 2, 2)
+    plt.subplot(1, 3, 3)
     plt.boxplot(
         [
             gtox_og_scores,
@@ -332,8 +351,8 @@ if __name__ == "__main__":
 
     # save boxplots of score changes of each instance for each dialect
     print("Saving OG scores vs. dialect scores comparison plots ...")
-    save_score_change_plots(og_splits, aave_splits, "aave")
-    save_score_change_plots(og_splits, nigerianD_splits, "nigerianD")
-    save_score_change_plots(og_splits, indianD_splits, "indianD")
-    save_score_change_plots(og_splits, singlish_splits, "singlish")
+    save_score_change_plots(og_splits, aave_splits, "AAVE")
+    save_score_change_plots(og_splits, nigerianD_splits, "NigerianD")
+    save_score_change_plots(og_splits, indianD_splits, "IndianD")
+    save_score_change_plots(og_splits, singlish_splits, "Singlish")
     print("All plots saved to ./outputs as .png successfully!")
