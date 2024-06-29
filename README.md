@@ -1,1 +1,1 @@
-# ToxBias-ParallelCor
+# Dialectic Bias in Toxicity Detection
