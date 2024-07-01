@@ -18,6 +18,7 @@ import pandas as pd
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 
 def process_batch(batchn):
@@ -124,20 +125,7 @@ def print_tox_increase_count(og_splits, dialect_splits, dialect_name):
     for both gold toxic and non-toxic sub-sets separately"""
     print(f"Dialect in test: {dialect_name}")
 
-    # condition 1: instances that are gold toxic
-    gtox_og_scores = og_splits[0]
-    gtox_dialect_scores = dialect_splits[0]
-    gtox_inc = [(a, b) for a, b in zip(gtox_og_scores, gtox_dialect_scores) if a < b]
-    print(
-        "gold toxic total:    ",
-        len(gtox_og_scores),
-        "dialect>og:",
-        len(gtox_inc),
-        "--->",
-        round(len(gtox_inc) / len(gtox_og_scores), 4),
-    )
-
-    # condition 2: instances that are gold non-toxic
+    # condition 1: instances that are gold non-toxic
     gntox_og_scores = og_splits[1]
     gntox_dialect_scores = dialect_splits[1]
     gntox_inc = [(a, b) for a, b in zip(gntox_og_scores, gntox_dialect_scores) if a < b]
@@ -150,7 +138,23 @@ def print_tox_increase_count(og_splits, dialect_splits, dialect_name):
         round(len(gntox_inc) / len(gntox_og_scores), 4),
     )
 
-    return True
+    # condition 2: instances that are gold toxic
+    gtox_og_scores = og_splits[0]
+    gtox_dialect_scores = dialect_splits[0]
+    gtox_inc = [(a, b) for a, b in zip(gtox_og_scores, gtox_dialect_scores) if a < b]
+    print(
+        "gold toxic total:    ",
+        len(gtox_og_scores),
+        "dialect>og:",
+        len(gtox_inc),
+        "--->",
+        round(len(gtox_inc) / len(gtox_og_scores), 4),
+    )
+
+    return (
+        round(len(gntox_inc) / len(gntox_og_scores), 4),
+        round(len(gtox_inc) / len(gtox_og_scores), 4),
+    )
 
 
 def save_all_score_plots(
@@ -179,13 +183,7 @@ def save_all_score_plots(
     plt.figure(figsize=(20, 10))
     plt.subplot(1, 3, 1)
     plt.boxplot(
-        [
-            og_scores,
-            aave_scores,
-            nigerianD_scores,
-            indianD_scores,
-            singlish_scores
-        ],
+        [og_scores, aave_scores, nigerianD_scores, indianD_scores, singlish_scores],
         labels=["Original", "AAVE", "NigerianD", "IndianD", "Singlish"],
     )
     plt.title("Overall Perspective scores")
@@ -217,7 +215,7 @@ def save_all_score_plots(
     plt.title("Perspective scores of gold toxic texts")
 
     # save plot for overviewing all scores across original and dialects
-    plt.savefig("../outputs/all-scores.png", bbox_inches='tight')
+    plt.savefig("../outputs/all-scores.png", bbox_inches="tight")
 
     return True
 
@@ -297,8 +295,49 @@ def save_score_change_plots(og_splits, dialect_splits, dialect_name):
     ax[1].set_title("Perspective scores of gold toxic texts")
 
     # save the plot to the figures folder
-    plt.savefig(f"../outputs/{dialect_name}-changes.png", bbox_inches='tight')
+    plt.savefig(f"../outputs/{dialect_name}-changes.png", bbox_inches="tight")
     print(f"|-- {dialect_name} done!")
+
+    return True
+
+
+def save_inc_dec_percentages_plot(inc_percentages):
+    """Collect how many percentages of instances suffer from toxicty score increase in dialect set
+    Save the percentile comparisons to output"""
+    colors = ["lightblue", "darkorange"] * 4
+
+    # plotting
+    plt.figure(figsize=(10, 4))
+    x_positions = np.array([0, 1, 2.5, 3.5, 5, 6, 7.5, 8.5])
+    for x_pos, value, color in zip(x_positions, inc_percentages, colors):
+        plt.bar(x_pos, value, color=color)
+
+    plt.xticks([])  # remove indexes on x axi
+
+    plt.ylim(0, 100)
+    plt.ylabel("Percentage (%)")
+    plt.title("Percentages suffer from toxicity score increase")
+    plt.grid(axis="y")
+
+    group_labels = ["AAVE", "NigerianD", "IndianD", "Singlish"]
+    group_positions = [
+        (x_positions[0] + x_positions[1]) / 2,
+        (x_positions[2] + x_positions[3]) / 2,
+        (x_positions[4] + x_positions[5]) / 2,
+        (x_positions[6] + x_positions[7]) / 2,
+    ]
+    for pos, label in zip(group_positions, group_labels):
+        plt.text(pos, -5, label, ha="center", va="top", color="black", fontsize=12)
+
+    # legend explaining the bar colors
+    legend_handles = [
+        mpatches.Patch(color="lightblue", label="gold non-toxic"),
+        mpatches.Patch(color="darkorange", label="gold toxic"),
+    ]
+    plt.legend(handles=legend_handles, loc="upper right")
+
+    # save the plot to the figures folder
+    plt.savefig(f"../outputs/score-increase-percentages.png", bbox_inches="tight")
 
     return True
 
@@ -333,14 +372,22 @@ if __name__ == "__main__":
     singlish_splits = split_tox_nontox(hatexplain_df, to_drop, singlish_scores)
 
     # print out the count of instances where the dialect scores are higher than the original scores
-    print_tox_increase_count(og_splits, aave_splits, "AAVE")
-    print_tox_increase_count(og_splits, nigerianD_splits, "NigerianD")
-    print_tox_increase_count(og_splits, indianD_splits, "IndianD")
-    print_tox_increase_count(og_splits, singlish_splits, "Singlish")
+    aave_gntox_incp, aave_gtox_incp = print_tox_increase_count(
+        og_splits, aave_splits, "AAVE"
+    )
+    nigerianD_gntox_incp, nigerianD_gtox_incp = print_tox_increase_count(
+        og_splits, nigerianD_splits, "NigerianD"
+    )
+    indianD_gntox_incp, indianD_gtox_incp = print_tox_increase_count(
+        og_splits, indianD_splits, "IndianD"
+    )
+    singlsih_gntox_incp, singlish_gtox_incp = print_tox_increase_count(
+        og_splits, singlish_splits, "Singlish"
+    )
 
     # save boxplots of all scores across original and 4 dialects
     print(
-        "\nSaving all scores plot (split by gold toxic/non-toxc) ...",
+        "\nSaving all scores plot ...",
         end="",
         flush=True,
     )
@@ -355,4 +402,22 @@ if __name__ == "__main__":
     save_score_change_plots(og_splits, nigerianD_splits, "NigerianD")
     save_score_change_plots(og_splits, indianD_splits, "IndianD")
     save_score_change_plots(og_splits, singlish_splits, "Singlish")
-    print("All plots saved to ./outputs as .png successfully!")
+
+    # save score increase percentile plots
+    print(
+        "Saving percentages of instances with toxicity score increase plot ...",
+        end="",
+        flush=True,
+    )
+    inc_percentages = [
+        aave_gntox_incp * 100,
+        aave_gtox_incp * 100,
+        nigerianD_gntox_incp * 100,
+        nigerianD_gtox_incp * 100,
+        indianD_gntox_incp * 100,
+        indianD_gtox_incp * 100,
+        singlsih_gntox_incp * 100,
+        singlish_gtox_incp * 100,
+    ]
+    save_inc_dec_percentages_plot(inc_percentages)
+    print(" done!")

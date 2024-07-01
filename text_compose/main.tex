@@ -171,11 +171,9 @@ The \textit{p}-values from all paired t-test results are far below the common th
 \end{table}
 
 \begin{figure*}[t]
-  \includegraphics[width=0.48\linewidth]{figs-misc/AAVE-changes.png}\hfill
-  \includegraphics[width=0.48\linewidth]{figs-misc/NigerianD-changes.png}\bigbreak
-  \includegraphics[width=0.48\linewidth]{figs-misc/IndianD-changes.png}\hfill
-  \includegraphics[width=0.48\linewidth]{figs-misc/Singlish-changes.png}
-  \caption{Changes in toxicity score of each instance betwenn the original and synthetic dialect set. Each original vs. dialect pair is split into two parts based on gold non-toxic and toxic label. Orange line indicates toxicity increasing on one instance when it is converted to dialect. Blue line indicates decreasing.}
+  \includegraphics[width=1.0\linewidth]{figs-misc/score-increase-percentages.png}
+  \caption{Percentages of instances form different dialect subsets that experience toxicity score increase compared to original unconverted texts. Each dialect set is split based on gold label in order to illustrate whether gold toxic or non-toxic texts suffer more from socre increase.}
+  \label{inc-percentages}
 \end{figure*}
 
 By splitting the results based on gold toxicity classes, the phenomenon still seems to persist. The right two plots in Figure \ref{all-scores} suggest, the score means of the dialect texts inside the gold toxic or non-toxic class are similar to those of the instances in master corpus of the corresponding class, so are the overall distributions. However, upon further inspection of the paired t-tests results, we discovered that inside the non-toxic class, all original vs. dialect pairs are consistently proven to be significantly different (original vs. AAVE: \textit{p}-value = 1.20946528341701e-21; original vs. NigerianD: \textit{p}-value = 1.0785895427150844e-06; original vs. IndianD: \textit{p}-value = 6.692747637347256e-37; original vs. Singlish: \textit{p}-value = 4.4973972765103815e-09).
@@ -185,6 +183,29 @@ The same holds true for gold toxic class (original vs. AAVE: \textit{p}-value = 
 Therefore, we conclude that despite similar overall score means of the master and the rest four parallel corpora, Perspective API’s toxicity scores exhibit strong inter-corporal differences when considering individual instances.
 
 \subsection{Toxicity score cappping}
+
+A hypothesis mentioned earlier is that there could be an asymmetry on how automatic toxicity scoring models react to different types of parallel texts based on their gold labels. Namely, when facing gold toxic texts, Perspective API would not score dialect aligned texts higher than their SAE counterparts, as the scores of the original texts are already high. But when it comes to the texts that are originally not toxic, the dialects are more likely to be scored higher due to certain syntactic features and surface markers.
+
+
+Upon inspecting the scores, we find that among the 7,771 gold non-toxic texts with valid scores from the Perspective API, 3,142 (40.43\%) of them suffer from an increase in toxicity when converted to AAVE. When converted to Nigerian, Indian and Singaporean English, 3,507 (45,13\%), 3,136 (40.36\%) and 4,131 (53.16\%) of these texts respectively exhibit a similar increase in toxicity. Among the 12,276 gold toxic texts, the ratio experiencing toxicity increase after dialect conversion is significantly smaller, with Singlish suffering from most (5,311, 43.26\%), followed by Nigerian dialect (4,591, 37.4\%) and AAVE (3,418, 27.84\%). And mere 3,348 (27.27\%) Indian English texts with gold toxic labels underwent a score increase. The percentages of gold non-toxic texts that are scored more toxic in dialect are consistently higher than that of the gold toxic texts (see in Figure \ref{inc-percentages}).
+
+The same can be observed on the data points on the second and third quartiles (Q2 and Q3) of the dataset. Since the distribution of the toxicity scores ranges from almost 0 to almost full 1.0 (see in Figure \ref{all-scores}), focusing on Q2 and Q3 provides a more centralized perspective, effectively minimizing the influence of outliers and offering a clearer insight into the typical characteristics of the data. Figure \ref{q2-q3} shows the toxicity changes of instances in master corpus and parallel instances in dialect corpora. In each dialect subplot, the left plot shows the subset of gold non-toxic whereas the right shows the gold toxic instances. The individual scores increasing and decreasing are indicated using orange and blue lines respectively. As the orange line density indicates, in the middle quartiles as well, a larger proportion of the gold non-toxic set displays a rise in toxicity scores compared to gold toxic subsets.
+
+\begin{figure*}[t]
+  \includegraphics[width=0.48\linewidth]{figs-misc/AAVE-changes.png}\hfill
+  \includegraphics[width=0.48\linewidth]{figs-misc/NigerianD-changes.png}\bigbreak
+  \includegraphics[width=0.48\linewidth]{figs-misc/IndianD-changes.png}\hfill
+  \includegraphics[width=0.48\linewidth]{figs-misc/Singlish-changes.png}
+  \caption{Changes in toxicity score of each instance betwenn the original and synthetic dialect set. Each original vs. dialect pair is split into two parts based on gold non-toxic and toxic label. Orange line indicates toxicity increasing on one instance when it is converted to dialect. Blue line indicates decreasing.}
+  \label{q2-q3}
+\end{figure*}
+
+\newpage
+
+As for the disparity of increase in degree, we found across all four dialect subsets, the toxicity scores of gold non-toxic sentences generally increase more than the toxic sentences. The toxicity scores of the non-toxic instances increased 2.5\% on average when converted to AAVE, as opposed to 2.2\% for gold toxic sentences. The asymmetry can also be found in all other three dialects (NigerianD: 2.6\% vs. 2.1\%; IndianD: 2.9\% vs. 2.5\%; Singlsih: 3.6\% vs. 2.9\%).
+
+
+
 
 
 
